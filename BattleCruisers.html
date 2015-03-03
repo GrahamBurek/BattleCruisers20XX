@@ -1,0 +1,142 @@
+
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <title>Battle Cruisers 20XX</title>
+    <script type="text/javascript"
+            src = "simpleGame.js"></script>
+    <script type="text/javascript">
+    
+    var game;
+    var tankGreen;
+    var tankRed;
+    
+    var background;
+    
+    function Bullet(owner){
+        //owner is the tank owning this bullet
+        
+        tBullet = new Sprite(game, "bullet.png", 5, 5);
+        
+        tBullet.owner = owner;
+        tBullet.hide();
+        tBullet.setBoundAction(DIE);
+        
+        tBullet.fire = function(){
+            //begin at center of my tank
+            //pointing in tank turret's direction
+            this.setPosition(this.owner.x, this.owner.y);
+            this.setMoveAngle(this.owner.turret.getImgAngle());
+            this.setSpeed(20);
+            this.show();
+        } // end fire
+        
+        tBullet.checkGravity = function(){
+            this.addVector(180, 1);
+        } // end checkGravity
+        
+        return tBullet;
+    } // end bullet
+    
+    function UserTank(){
+        tTank = new Sprite(game, "space.png", 50, 25);
+        tTank.setSpeed(0);
+        tTank.setPosition(100, 550);
+        
+        tTank.bullet = new Bullet(tTank);
+        
+        tTank.checkKeys = function(){
+            if (keysDown[K_A]){
+                this.changeImgAngleBy(-10);
+            }
+            
+            if (keysDown[K_D]){
+                this.changeImgAngleBy(10);
+               //this.changeAngleBy(10);
+            }
+                       
+            if (keysDown[K_W]){
+                if(this.getSpeed()< 65){
+                this.addVector(this.getImgAngle(), 3);
+            }
+                 // end if
+            }
+            
+           // if (keysDown[K_S]){
+                
+                
+            //}
+            
+            if (keysDown[K_SPACE]){
+                this.bullet.fire();
+            }
+            if(this.getSpeed()>0){
+                if(this.getSpeed() < 1 && this.getSpeed() > 0){
+                    this.changeSpeedBy(-(this.getSpeed()));
+                } else{
+            this.changeSpeedBy(-1);
+        }
+        }
+            this.bullet.checkGravity();
+            this.bullet.update();
+            
+        } // end checkKeys
+                
+        return tTank;
+    } // end tank
+    
+    function DroneTank(){
+        tTank = new Sprite(game, "redTank.png", 50, 25);
+        
+        tTank.setPosition(450, 550);
+        
+        tTank.moveRandom = function(){
+            this.setSpeed((Math.random() * 10) - 5);
+        } // end moveRandom
+        
+        tTank.reset = function(){
+            halfWidth = game.width / 2;
+            x = (Math.random() * halfWidth) + halfWidth;
+            this.setPosition(x, 550);
+        } // end reset
+        
+        return tTank;
+    
+    } // end DroneTank
+    
+    function checkHit(){
+        if (tankGreen.bullet.collidesWith(tankRed)){
+            tankRed.reset();
+        } // end if
+    } // end checkHit
+    
+    function init(){
+        game = new Scene();
+        game.setSize(800, 600);
+        tankGreen = new UserTank();
+        tankRed = new DroneTank();
+        
+        background = new Sprite(game, "background.png", 800, 600);
+        background.setSpeed(0);
+        background.setPosition(400, 300);
+        game.start();
+    } // end init
+    
+    function update(){
+      game.clear();
+      
+      background.update();
+      tankGreen.checkKeys();
+      tankRed.moveRandom();
+      checkHit();
+      
+      tankGreen.update();
+      tankRed.update();
+    } // end update
+    </script>
+</head>
+<body onload = "init()">
+    <div>WASD to control tank, space to fire</div>
+</body>
+</html>
