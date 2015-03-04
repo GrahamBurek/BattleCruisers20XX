@@ -1,156 +1,193 @@
 
 <!DOCTYPE HTML>
 <html lang="en-US">
-<head>
-    <meta charset="UTF-8">
-    <title>Battle Cruisers 20XX</title>
-    <script type="text/javascript"
-            src = "simpleGame.js"></script>
-    <script type="text/javascript">
-    
-    var game;
-    var ship1;
-    var ship2;
-    var bluebulletfade = 20;
-    var redbulletfade = 20;
-    var background;
-    
-    function Bullet(owner){
-        //owner is the tank owning this bullet
-        
-        tBullet = new Sprite(game, "bluebullet.png", 5, 5);
-        
-        tBullet.owner = owner;
-        tBullet.hide();
-        tBullet.setBoundAction(BOUNCE);
-        //if(tBullet.collidesWith(asteroid))
-        
-        tBullet.fire = function(){
-            this.setPosition(this.owner.x, this.owner.y);
-            this.setMoveAngle(this.owner.getImgAngle());
-            this.setSpeed(80);
-            this.show();
-        } // end fire
-        
-        
-        return tBullet;
-    } // end bullet
-    
-    function Ship1(){
-        ship1 = new Sprite(game, "space.png", 50, 25);
-        ship1.setSpeed(0);
-        ship1.setPosition(100, 550);
-        ship1.setBoundAction(BOUNCE);
-        ship1.bullet = new Bullet(ship1);
-        
-        ship1.checkKeys = function(){
-            if (keysDown[K_A]){
-                this.changeImgAngleBy(-10);
-            }
+    <head>
+        <meta charset="UTF-8">
+        <title>Battle Cruisers 20XX</title>
+        <script type="text/javascript"
+        src = "simpleGame.js"></script>
+        <script type="text/javascript">
             
-            if (keysDown[K_D]){
-                this.changeImgAngleBy(10);
-               //this.changeAngleBy(10);
-            }
-                       
-            if (keysDown[K_W]){
-                if(this.getSpeed()< 65){
-                this.addVector(this.getImgAngle(), 3);
-            }
-                 // end if
-            }
-            
-            if (keysDown[K_S]){
-                this.bullet.fire();
-            } 
-            if(this.getSpeed()>0){
-                if(this.getSpeed() <= 1 && this.getSpeed() > 0){
-                    this.changeSpeedBy(-(this.getSpeed()));
-                } else{
-            this.changeSpeedBy(-1);
-        }
-        }
-            this.bullet.update();
-            
-        } // end checkKeys
-                
-        return ship1;
-    } // end tank
-    
-   function Ship2(){
-        ship2 = new Sprite(game, "space.png", 50, 25);
-        ship2.setSpeed(0);
-        ship2.setPosition(200, 600);
-        
-        ship2.bullet = new Bullet(ship2);
-        
-        ship2.checkKeys = function(){
-            if (keysDown[K_LEFT]){
-                this.changeImgAngleBy(-10);
-            }
-            
-            if (keysDown[K_RIGHT]){
-                this.changeImgAngleBy(10);
-               //this.changeAngleBy(10);
-            }
-                       
-            if (keysDown[K_UP]){
-                if(this.getSpeed()< 65){
-                this.addVector(this.getImgAngle(), 3);
-            }
-                 // end if
-            }
-            
-            if (keysDown[K_DOWN]){
-                this.bullet.fire();
-            }
-            if(this.getSpeed()>0){
-                if(this.getSpeed() <= 1 && this.getSpeed() > 0){
-                    this.changeSpeedBy(-(this.getSpeed()));
-                } else{
-            this.changeSpeedBy(-1);
-        }
-        }
-            this.bullet.update();
-            
-        } // end checkKeys
-                
-        return ship2;
-    } // end tank
-    
-   /* function checkHit(){
-        if (tankGreen.bullet.collidesWith(tankRed)){
-            tankRed.reset();
-        } // end if
-    } // end checkHit **/
-    
-    function init(){
-        game = new Scene();
-        game.setSize(800, 600);
-        ship1 = new Ship1();
-        ship2 = new Ship2();
-        asteroid = new Sprite(game, "asteroids4.png", 200, 200);
-        asteroid.setPosition(300,300);
-        asteroid.setSpeed(0);
-        background = new Sprite(game, "background.png", 800, 600);
-        background.setSpeed(0);
-        background.setPosition(400, 300);
-        game.start();
-    } // end init
-    
-    function update(){
-      game.clear();
-      
-      background.update();
-      ship1.checkKeys();
-      ship2.checkKeys();
-      
-      ship1.update();
-      ship2.update();
-    } // end update
-    </script>
-</head>
-<body onload = "init()">
-    <div>WASD to control tank, space to fire</div>
-</body>
+            var game;
+            var ship1;
+            var ship2;
+            var bluebulletfade = 20;
+            var redbulletfade = 20;
+            var background;
+            var redbullet;
+            var bluebullet;
+            var ship1time;
+            var ship2time;
+
+            function RedBullet(owner) {
+                //owner is the ship owning this bullet
+                ship1time = new Timer();
+                redbullet = new Sprite(game, "redbullet.png", 5, 5);
+
+                redbullet.owner = owner;
+                redbullet.hide();
+                redbullet.setBoundAction(BOUNCE);
+                //if(tBullet.collidesWith(asteroid))
+
+                redbullet.fire = function () {
+                    ship1time.reset();
+                    this.setPosition(this.owner.x, this.owner.y);
+                    this.setMoveAngle(this.owner.getImgAngle());
+                    this.setSpeed(80);
+                    this.show();
+                    //this.startTrail();
+                    if (time.getElapsedTime() == 2) {
+                        redbullet.hide();
+                    }
+                } // end fire
+
+
+                return redbullet;
+            } // end bullet
+
+            function BlueBullet(owner) {
+                //owner is the ship owning this bullet
+                ship2time = new Timer();
+                bluebullet = new Sprite(game, "bluebullet.png", 5, 5);
+
+                bluebullet.owner = owner;
+                bluebullet.hide();
+                bluebullet.setBoundAction(BOUNCE);
+                //if(tBullet.collidesWith(asteroid))
+
+                bluebullet.fire = function () {
+                    ship2time.reset();
+                    this.setPosition(this.owner.x, this.owner.y);
+                    this.setMoveAngle(this.owner.getImgAngle());
+                    this.setSpeed(80);
+                    this.show();
+                    //this.startTrail();
+                    if (time.getElapsedTime() == 2) {
+                        bluebullet.hide();
+                    }
+                } // end fire
+
+                return bluebullet;
+            } // end bullet
+
+            function Ship1() {
+                ship1 = new Sprite(game, "space.png", 50, 25);
+                ship1.setSpeed(0);
+                ship1.setPosition(100, 550);
+                ship1.setBoundAction(BOUNCE);
+                ship1.bullet = new RedBullet(ship1);
+
+                ship1.checkKeys = function () {
+                    if (keysDown[K_A]) {
+                        this.changeImgAngleBy(-10);
+                    }
+
+                    if (keysDown[K_D]) {
+                        this.changeImgAngleBy(10);
+                        //this.changeAngleBy(10);
+                    }
+
+                    if (keysDown[K_W]) {
+                        if (this.getSpeed() < 65) {
+                            this.addVector(this.getImgAngle(), 3);
+                        }
+                        // end if
+                    }
+
+                    if (keysDown[K_S]) {
+                        if (ship1time.getElapsedTime() > 2) {
+                            this.bullet.fire();
+                        }
+                    }
+                    if (this.getSpeed() > 0) {
+                        if (this.getSpeed() <= 1 && this.getSpeed() > 0) {
+                            this.changeSpeedBy(-(this.getSpeed()));
+                        } else {
+                            this.changeSpeedBy(-1);
+                        }
+                    }
+
+
+                } // end checkKeys
+
+                return ship1;
+            } // end tank
+
+            function Ship2() {
+                ship2 = new Sprite(game, "space.png", 50, 25);
+                ship2.setSpeed(0);
+                ship2.setPosition(200, 600);
+
+                ship2.bullet = new BlueBullet(ship2);
+
+                ship2.checkKeys = function () {
+                    if (keysDown[K_LEFT]) {
+                        this.changeImgAngleBy(-10);
+                    }
+
+                    if (keysDown[K_RIGHT]) {
+                        this.changeImgAngleBy(10);
+                        //this.changeAngleBy(10);
+                    }
+
+                    if (keysDown[K_UP]) {
+                        if (this.getSpeed() < 65) {
+                            this.addVector(this.getImgAngle(), 3);
+                        }
+                        // end if
+                    }
+
+                    if (keysDown[K_DOWN]) {
+                        if (ship2time.getElapsedTime() > 2) {
+                            this.bullet.fire();
+                        }
+                    }
+                    if (this.getSpeed() > 0) {
+                        if (this.getSpeed() <= 1 && this.getSpeed() > 0) {
+                            this.changeSpeedBy(-(this.getSpeed()));
+                        } else {
+                            this.changeSpeedBy(-1);
+                        }
+                    }
+
+                } // end checkKeys
+
+                return ship2;
+            } // end tank
+
+            /* function checkHit(){
+             if (tankGreen.bullet.collidesWith(tankRed)){
+             tankRed.reset();
+             } // end if
+             } // end checkHit **/
+
+            function init() {
+                game = new Scene();
+                game.setSize(800, 600);
+                ship1 = new Ship1();
+                ship2 = new Ship2();
+                background = new Sprite(game, "background.png", 800, 600);
+                background.setSpeed(0);
+                background.setPosition(400, 300);
+                asteroid = new Sprite(game, "asteroids4.png", 200, 200);
+                asteroid.setPosition(100, 550);
+                asteroid.setSpeed(0);
+                game.start();
+            } // end init
+
+            function update() {
+                game.clear();
+                background.update();
+                redbullet.update();
+                bluebullet.update();
+                ship1.update();
+                ship2.update();
+                ship1.checkKeys();
+                ship2.checkKeys();
+            } // end update
+        </script>
+    </head>
+    <body onload = "init()">
+        <div>WASD to control tank, space to fire</div>
+    </body>
 </html>
