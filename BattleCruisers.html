@@ -9,44 +9,41 @@
     <script type="text/javascript">
     
     var game;
-    var tankGreen;
-    var tankRed;
-    
+    var ship1;
+    var ship2;
+    var bluebulletfade = 20;
+    var redbulletfade = 20;
     var background;
     
     function Bullet(owner){
         //owner is the tank owning this bullet
         
-        tBullet = new Sprite(game, "bullet.png", 5, 5);
+        tBullet = new Sprite(game, "bluebullet.png", 5, 5);
         
         tBullet.owner = owner;
         tBullet.hide();
-        tBullet.setBoundAction(DIE);
+        tBullet.setBoundAction(BOUNCE);
+        //if(tBullet.collidesWith(asteroid))
         
         tBullet.fire = function(){
-            //begin at center of my tank
-            //pointing in tank turret's direction
             this.setPosition(this.owner.x, this.owner.y);
-            this.setMoveAngle(this.owner.turret.getImgAngle());
-            this.setSpeed(20);
+            this.setMoveAngle(this.owner.getImgAngle());
+            this.setSpeed(80);
             this.show();
         } // end fire
         
-        tBullet.checkGravity = function(){
-            this.addVector(180, 1);
-        } // end checkGravity
         
         return tBullet;
     } // end bullet
     
-    function UserTank(){
-        tTank = new Sprite(game, "space.png", 50, 25);
-        tTank.setSpeed(0);
-        tTank.setPosition(100, 550);
+    function Ship1(){
+        ship1 = new Sprite(game, "space.png", 50, 25);
+        ship1.setSpeed(0);
+        ship1.setPosition(100, 550);
+        ship1.setBoundAction(BOUNCE);
+        ship1.bullet = new Bullet(ship1);
         
-        tTank.bullet = new Bullet(tTank);
-        
-        tTank.checkKeys = function(){
+        ship1.checkKeys = function(){
             if (keysDown[K_A]){
                 this.changeImgAngleBy(-10);
             }
@@ -63,60 +60,78 @@
                  // end if
             }
             
-           // if (keysDown[K_S]){
-                
-                
-            //}
-            
-            if (keysDown[K_SPACE]){
+            if (keysDown[K_S]){
                 this.bullet.fire();
-            }
+            } 
             if(this.getSpeed()>0){
-                if(this.getSpeed() < 1 && this.getSpeed() > 0){
+                if(this.getSpeed() <= 1 && this.getSpeed() > 0){
                     this.changeSpeedBy(-(this.getSpeed()));
                 } else{
             this.changeSpeedBy(-1);
         }
         }
-            this.bullet.checkGravity();
             this.bullet.update();
             
         } // end checkKeys
                 
-        return tTank;
+        return ship1;
     } // end tank
     
-    function DroneTank(){
-        tTank = new Sprite(game, "redTank.png", 50, 25);
+   function Ship2(){
+        ship2 = new Sprite(game, "space.png", 50, 25);
+        ship2.setSpeed(0);
+        ship2.setPosition(200, 600);
         
-        tTank.setPosition(450, 550);
+        ship2.bullet = new Bullet(ship2);
         
-        tTank.moveRandom = function(){
-            this.setSpeed((Math.random() * 10) - 5);
-        } // end moveRandom
-        
-        tTank.reset = function(){
-            halfWidth = game.width / 2;
-            x = (Math.random() * halfWidth) + halfWidth;
-            this.setPosition(x, 550);
-        } // end reset
-        
-        return tTank;
+        ship2.checkKeys = function(){
+            if (keysDown[K_LEFT]){
+                this.changeImgAngleBy(-10);
+            }
+            
+            if (keysDown[K_RIGHT]){
+                this.changeImgAngleBy(10);
+               //this.changeAngleBy(10);
+            }
+                       
+            if (keysDown[K_UP]){
+                if(this.getSpeed()< 65){
+                this.addVector(this.getImgAngle(), 3);
+            }
+                 // end if
+            }
+            
+            if (keysDown[K_DOWN]){
+                this.bullet.fire();
+            }
+            if(this.getSpeed()>0){
+                if(this.getSpeed() <= 1 && this.getSpeed() > 0){
+                    this.changeSpeedBy(-(this.getSpeed()));
+                } else{
+            this.changeSpeedBy(-1);
+        }
+        }
+            this.bullet.update();
+            
+        } // end checkKeys
+                
+        return ship2;
+    } // end tank
     
-    } // end DroneTank
-    
-    function checkHit(){
+   /* function checkHit(){
         if (tankGreen.bullet.collidesWith(tankRed)){
             tankRed.reset();
         } // end if
-    } // end checkHit
+    } // end checkHit **/
     
     function init(){
         game = new Scene();
         game.setSize(800, 600);
-        tankGreen = new UserTank();
-        tankRed = new DroneTank();
-        
+        ship1 = new Ship1();
+        ship2 = new Ship2();
+        asteroid = new Sprite(game, "asteroids4.png", 200, 200);
+        asteroid.setPosition(300,300);
+        asteroid.setSpeed(0);
         background = new Sprite(game, "background.png", 800, 600);
         background.setSpeed(0);
         background.setPosition(400, 300);
@@ -127,12 +142,11 @@
       game.clear();
       
       background.update();
-      tankGreen.checkKeys();
-      tankRed.moveRandom();
-      checkHit();
+      ship1.checkKeys();
+      ship2.checkKeys();
       
-      tankGreen.update();
-      tankRed.update();
+      ship1.update();
+      ship2.update();
     } // end update
     </script>
 </head>
