@@ -7,7 +7,7 @@
         <script type="text/javascript"
         src = "simpleGame.js"></script>
         <script type="text/javascript">
-            
+
             var game;
             var ship1;
             var ship2;
@@ -18,6 +18,9 @@
             var bluebullet;
             var ship1time;
             var ship2time;
+            var blueBulletBounce;
+            var redBulletBounce;
+            var asteroid1;
 
             function RedBullet(owner) {
                 //owner is the ship owning this bullet
@@ -36,14 +39,16 @@
                     this.setSpeed(80);
                     this.show();
                     //this.startTrail();
-                    if (time.getElapsedTime() == 2) {
-                        redbullet.hide();
-                    }
                 } // end fire
-
-
                 return redbullet;
             } // end bullet
+            
+            function asteroid() {
+                asteroid1 = new Sprite(game, "asteroids4.png", 50, 50);
+                asteroid1.setPosition(400, 550);
+                asteroid1.setSpeed(0);
+                return asteroid1;
+            }
 
             function BlueBullet(owner) {
                 //owner is the ship owning this bullet
@@ -77,7 +82,13 @@
                 ship1.setBoundAction(BOUNCE);
                 ship1.bullet = new RedBullet(ship1);
 
+
                 ship1.checkKeys = function () {
+                    
+                    if (ship1time.getElapsedTime() > 2) {
+                        redbullet.hide();
+                    }
+                    
                     if (keysDown[K_A]) {
                         this.changeImgAngleBy(-10);
                     }
@@ -113,14 +124,20 @@
                 return ship1;
             } // end tank
 
+
+
             function Ship2() {
                 ship2 = new Sprite(game, "space.png", 50, 25);
                 ship2.setSpeed(0);
                 ship2.setPosition(200, 600);
-
+                ship2.setBoundAction(BOUNCE);
                 ship2.bullet = new BlueBullet(ship2);
 
                 ship2.checkKeys = function () {
+                    if (ship2time.getElapsedTime() > 2) {
+                        bluebullet.hide();
+                    }
+                    
                     if (keysDown[K_LEFT]) {
                         this.changeImgAngleBy(-10);
                     }
@@ -166,12 +183,11 @@
                 game.setSize(800, 600);
                 ship1 = new Ship1();
                 ship2 = new Ship2();
+                asteroid1 = new asteroid();
                 background = new Sprite(game, "background.png", 800, 600);
                 background.setSpeed(0);
                 background.setPosition(400, 300);
-                asteroid = new Sprite(game, "asteroids4.png", 200, 200);
-                asteroid.setPosition(100, 550);
-                asteroid.setSpeed(0);
+
                 game.start();
             } // end init
 
@@ -180,10 +196,39 @@
                 background.update();
                 redbullet.update();
                 bluebullet.update();
+                asteroid1.update();
                 ship1.update();
                 ship2.update();
                 ship1.checkKeys();
                 ship2.checkKeys();
+                
+                if (redbullet.collidesWith(asteroid1)) {
+                    redbullet.dy *= -1;
+                    redbullet.dx *= -1;
+                    redbullet.calcSpeedAngle();
+                    redbullet.imgAngle = redbullet.moveAngle;
+                }
+                
+                if (bluebullet.collidesWith(asteroid1)) {
+                    bluebullet.dy *= -1;
+                    bluebullet.dx *= -1;
+                    bluebullet.calcSpeedAngle();
+                    bluebullet.imgAngle = bluebullet.moveAngle;
+                }
+                if (ship1.collidesWith(asteroid1)) {
+                    ship1.dy *= -1;
+                    ship1.dx *= -1;
+                    ship1.calcSpeedAngle();
+                    ship1.imgAngle = ship1.moveAngle;
+
+                }
+                if (ship2.collidesWith(asteroid1)) {
+                    ship2.dy *= -1;
+                    ship2.dx *= -1;
+                    ship2.calcSpeedAngle();
+                    ship2.imgAngle = ship2.moveAngle;
+
+                }
             } // end update
         </script>
     </head>
