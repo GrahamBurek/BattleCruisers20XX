@@ -1,4 +1,3 @@
-
 <!DOCTYPE HTML>
 <html lang="en-US">
     <head>
@@ -11,15 +10,13 @@
             var game;
             var ship1;
             var ship2;
-            var bluebulletfade = 20;
-            var redbulletfade = 20;
+            //var bluebulletfade = 20;
+            //var redbulletfade = 20;
             var background;
             var redbullet;
             var bluebullet;
             var ship1time;
             var ship2time;
-            var blueBulletBounce;
-            var redBulletBounce;
             var asteroid1;
 
             function RedBullet(owner) {
@@ -40,15 +37,17 @@
                     this.show();
                     //this.startTrail();
                 } // end fire
+
+                redbullet.checkCollisions = function () {
+                    if (redbullet.collidesWith(asteroid1)) {
+                        redbullet.dy *= -1;
+                        redbullet.dx *= -1;
+                        redbullet.calcSpeedAngle();
+                        redbullet.imgAngle = redbullet.moveAngle;
+                    }
+                }
                 return redbullet;
             } // end bullet
-            
-            function asteroid() {
-                asteroid1 = new Sprite(game, "asteroids4.png", 50, 50);
-                asteroid1.setPosition(400, 550);
-                asteroid1.setSpeed(0);
-                return asteroid1;
-            }
 
             function BlueBullet(owner) {
                 //owner is the ship owning this bullet
@@ -58,7 +57,6 @@
                 bluebullet.owner = owner;
                 bluebullet.hide();
                 bluebullet.setBoundAction(BOUNCE);
-                //if(tBullet.collidesWith(asteroid))
 
                 bluebullet.fire = function () {
                     ship2time.reset();
@@ -72,8 +70,23 @@
                     }
                 } // end fire
 
+                bluebullet.checkCollisions = function () {
+                    if (bluebullet.collidesWith(asteroid1)) {
+                        bluebullet.dy *= -1;
+                        bluebullet.dx *= -1;
+                        bluebullet.calcSpeedAngle();
+                        bluebullet.imgAngle = bluebullet.moveAngle;
+                    }
+                }
                 return bluebullet;
             } // end bullet
+
+            function asteroid() {
+                asteroid1 = new Sprite(game, "asteroids4.png", 50, 50);
+                asteroid1.setPosition(400, 550);
+                asteroid1.setSpeed(0);
+                return asteroid1;
+            }
 
             function Ship1() {
                 ship1 = new Sprite(game, "space.png", 50, 25);
@@ -82,13 +95,23 @@
                 ship1.setBoundAction(BOUNCE);
                 ship1.bullet = new RedBullet(ship1);
 
+                ship1.checkCollisions = function () {
+                    if (ship1.collidesWith(asteroid1)) {
+                        ship1.dy *= -1;
+                        ship1.dx *= -1;
+                        ship1.calcSpeedAngle();
+                        ship1.imgAngle = ship1.moveAngle;
+                        //prevents ship from getting stuck on asteroid bounce
+                        ship1.changeSpeedBy(1);
+                    }
+                }
 
                 ship1.checkKeys = function () {
-                    
+
                     if (ship1time.getElapsedTime() > 2) {
                         redbullet.hide();
                     }
-                    
+
                     if (keysDown[K_A]) {
                         this.changeImgAngleBy(-10);
                     }
@@ -117,14 +140,10 @@
                             this.changeSpeedBy(-1);
                         }
                     }
-
-
                 } // end checkKeys
 
                 return ship1;
             } // end tank
-
-
 
             function Ship2() {
                 ship2 = new Sprite(game, "space.png", 50, 25);
@@ -133,11 +152,22 @@
                 ship2.setBoundAction(BOUNCE);
                 ship2.bullet = new BlueBullet(ship2);
 
+                ship2.checkCollisions = function () {
+                    if (ship2.collidesWith(asteroid1)) {
+                        ship2.dy *= -1;
+                        ship2.dx *= -1;
+                        ship2.calcSpeedAngle();
+                        ship2.imgAngle = ship2.moveAngle;
+                        //prevents ship from getting stuck on asteroid bounce
+                        ship2.changeSpeedBy(1);
+                    }
+                }
+
                 ship2.checkKeys = function () {
                     if (ship2time.getElapsedTime() > 2) {
                         bluebullet.hide();
                     }
-                    
+
                     if (keysDown[K_LEFT]) {
                         this.changeImgAngleBy(-10);
                     }
@@ -168,9 +198,8 @@
                     }
 
                 } // end checkKeys
-
                 return ship2;
-            } // end tank
+            } // end ship2
 
             /* function checkHit(){
              if (tankGreen.bullet.collidesWith(tankRed)){
@@ -193,42 +222,20 @@
 
             function update() {
                 game.clear();
+                
+                ship1.checkKeys();
+                ship2.checkKeys();
+                ship1.checkCollisions();
+                ship2.checkCollisions();
+                redbullet.checkCollisions();
+                bluebullet.checkCollisions();
+                
                 background.update();
                 redbullet.update();
                 bluebullet.update();
                 asteroid1.update();
                 ship1.update();
                 ship2.update();
-                ship1.checkKeys();
-                ship2.checkKeys();
-                
-                if (redbullet.collidesWith(asteroid1)) {
-                    redbullet.dy *= -1;
-                    redbullet.dx *= -1;
-                    redbullet.calcSpeedAngle();
-                    redbullet.imgAngle = redbullet.moveAngle;
-                }
-                
-                if (bluebullet.collidesWith(asteroid1)) {
-                    bluebullet.dy *= -1;
-                    bluebullet.dx *= -1;
-                    bluebullet.calcSpeedAngle();
-                    bluebullet.imgAngle = bluebullet.moveAngle;
-                }
-                if (ship1.collidesWith(asteroid1)) {
-                    ship1.dy *= -1;
-                    ship1.dx *= -1;
-                    ship1.calcSpeedAngle();
-                    ship1.imgAngle = ship1.moveAngle;
-
-                }
-                if (ship2.collidesWith(asteroid1)) {
-                    ship2.dy *= -1;
-                    ship2.dx *= -1;
-                    ship2.calcSpeedAngle();
-                    ship2.imgAngle = ship2.moveAngle;
-
-                }
             } // end update
         </script>
     </head>
