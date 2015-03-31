@@ -6,9 +6,6 @@
         <script type="text/javascript"
         src = "simplegame.js"></script>
         <script type="text/javascript">
-
-            var maxRedBullets = 10;
-            var maxBlueBullets = 10;
             var game;
             var ship1;
             var ship2;
@@ -19,11 +16,7 @@
             var bluebullet;
             var ship1time;
             var ship2time;
-            var asteroid1;
-            var redBullets;
-            var blueBullets;
-            var currentRedBullet = 0;
-            var currentBlueBullet = 0;
+            var asteroid1;         
             var redCharge = 0;
             var blueCharge = 0;
             var blueBulletBounces = 0;
@@ -34,16 +27,15 @@
 
                 redbullet = new Sprite(game, "redbullet.png", 10, 10);
 
-                redbullet.owner = owner;
-                redbullet.hide();
-                redbullet.setBoundAction(BOUNCE);
-                //if(tBullet.collidesWith(asteroid))
-                redbullet.redBulletBounces = 0;
+            function RedBullet(owner) {
+                //owner is the ship owning this bullet
+                ship1time = new Timer();
+                redbullet = new Sprite(game, "redbullet.png", 5, 5);
                 redbullet.fire = function () {
                     ship1time.reset();
                     this.setPosition(this.owner.x, this.owner.y);
                     this.setMoveAngle(this.owner.getImgAngle());
-                    this.setSpeed(80);
+                    this.setSpeed(50);
                     this.show();
                     //this.startTrail();
                 } // end fire
@@ -65,28 +57,28 @@
                 }
                 return redbullet;
             } // end bullet
-
+>>>>>>> workingbullets:BattleCruisers.html
             function BlueBullet(owner) {
                 //owner is the ship owning this bullet
                 ship2time = new Timer();
                 bluebullet = new Sprite(game, "bluebullet.png", 5, 5);
-
+                bluebullet.blueBulletBounces = 0;
                 bluebullet.owner = owner;
                 bluebullet.hide();
                 bluebullet.setBoundAction(BOUNCE);
-                bluebullet.blueBulletBounces = 0;
+
                 bluebullet.fire = function () {
                     ship2time.reset();
                     this.setPosition(this.owner.x, this.owner.y);
                     this.setMoveAngle(this.owner.getImgAngle());
-                    this.setSpeed(80);
+
+                    this.setSpeed(30);
                     this.show();
                     //this.startTrail();
-                    //if (time.getElapsedTime() == 2) {
-                    //    bluebullet.hide();
-                    //}
+                    if (ship2time.getElapsedTime() == 2) {
+                        bluebullet.hide();
+                    }
                 } // end fire
-
                 bluebullet.checkCollisions = function () {
                     if (bluebullet.collidesWith(asteroid1)) {
                         bluebullet.dy *= -1;
@@ -100,42 +92,24 @@
                 bluebullet.checkBounces = function(){
                     if(blueBulletBounces < 1){
                             bluebullet.hide();
-                        }
+                         }
                 }
                 return bluebullet;
             } // end bullet
-
+			
             function asteroid() {
                 asteroid1 = new Sprite(game, "asteroids4.png", 50, 50);
-                asteroid1.setPosition(700,300);
+                asteroid1.setPosition(400, 350);
                 asteroid1.setSpeed(0);
                 return asteroid1;
             }
-
-         /*   function makeRedBullets(ship) {
-                redBullets = new Array(maxRedBullets);
-                for (var i = 0; i <= maxRedBullets; i++) {
-                    redBullets[i] = new RedBullet(ship);
-                }
-                return redBullets;
-            }
-
-            function makeBlueBullets(ship) {
-                blueBullets = new Array(maxBlueBullets);
-                for (var i = 0; i <= maxBlueBullets; i++) {
-                    blueBullets[i] = new BlueBullet(ship);
-                }
-                return blueBullets;
-            } **/
-
+			
             function Ship1() {
-                ship1time = new Timer();
                 ship1 = new Sprite(game, "space.png", 50, 25);
-             //   ship1.bullets = new makeRedBullets(ship1);
                 ship1.setSpeed(0);
-                ship1.bullet = new RedBullet(ship1);
                 ship1.setPosition(100, 550);
                 ship1.setBoundAction(BOUNCE);
+                ship1.bullet = new RedBullet(ship1);
 
                 ship1.checkCollisions = function () {
                     if (ship1.collidesWith(asteroid1)) {
@@ -149,8 +123,9 @@
                 }
 
                 ship1.checkKeys = function () {
-
-
+                    if (ship1time.getElapsedTime() > 2) {
+                        redbullet.hide();
+                    }
                     if (keysDown[K_A]) {
                         this.changeImgAngleBy(-10);
                     }
@@ -166,6 +141,7 @@
                         }
                         // end if
                     }
+
 
                     if (keysDown[K_S]) {
                         if (ship1time.getElapsedTime() > 2) {
@@ -183,6 +159,7 @@
                            redBulletBounces = redCharge/100;
                            this.bullet.fire();
                            redCharge = 0;
+
                     }
                     if (this.getSpeed() > 0) {
                         if (this.getSpeed() <= 1 && this.getSpeed() > 0) {
@@ -195,15 +172,14 @@
 
                 return ship1;
             } // end tank
-
+			
             function Ship2() {
                 ship2 = new Sprite(game, "space.png", 50, 25);
                 ship2.setSpeed(0);
-                ship2.bullet = BlueBullet(ship2);
                 ship2.setPosition(200, 600);
                 ship2.setBoundAction(BOUNCE);
-              //  ship2.bullets = new makeBlueBullets(ship2);
-
+                ship2.bullet = new BlueBullet(ship2);
+				
                 ship2.checkCollisions = function () {
                     if (ship2.collidesWith(asteroid1)) {
                         ship2.dy *= -1;
@@ -235,6 +211,7 @@
                         }
                         // end if
                     }
+<<<<<<< HEAD:BattleCruisers/public_html/BattleCruisers.html
 
                     if (keysDown[K_DOWN]) {
                         if (ship2time.getElapsedTime() > 2) {
@@ -252,6 +229,7 @@
                          blueCharge = 0;
                     }
                     
+
                     if (this.getSpeed() > 0) {
                         if (this.getSpeed() <= 1 && this.getSpeed() > 0) {
                             this.changeSpeedBy(-(this.getSpeed()));
@@ -259,7 +237,6 @@
                             this.changeSpeedBy(-1);
                         }
                     }
-
                 } // end checkKeys
                 return ship2;
             } // end ship2
@@ -282,38 +259,23 @@
 
                 game.start();
             } // end init
-
-          /*  function updateBullets() {
-                for (i = 0; i < 10; i++) {
-                    redBullets[i].update();
-                    blueBullets[i].update();
-                } // end for
-            } **/
-            
-        /*    function checkBulletCollisions(){
-                for (i = 0; i < 10; i++) {
-                    redBullets[i].checkCollisions;
-                    blueBullets[i].checkCollision;
-                }
-            } **/
-
             function update() {
                 game.clear();
-
+                
                 ship1.checkKeys();
                 ship2.checkKeys();
                 ship1.checkCollisions();
                 ship2.checkCollisions();
                 redbullet.checkCollisions();
                 bluebullet.checkCollisions();
-
+                redbullet.checkBounces();
+                bluebullet.checkBounces();
                 background.update();
-               // updateBullets();
+                redbullet.update();
+                bluebullet.update();
                 asteroid1.update();
                 ship1.update();
                 ship2.update();
-                redbullet.checkBounces();
-                bluebullet.checkBounces();
             } // end update
         </script>
     </head>
