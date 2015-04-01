@@ -17,10 +17,14 @@
             var ship1time;
             var ship2time;
             var asteroid1;
+            var redBulletBounces = 0.0;
+            var blueBulletBounces = 0;
+            var redCharge = 0;
+            var blueCharge = 0;
             function RedBullet(owner) {
                 //owner is the ship owning this bullet
                 ship1time = new Timer();
-                redbullet = new Sprite(game, "redbullet.png", 5, 5);
+                redbullet = new Sprite(game, "redbullet.png", 100, 50);
                 redbullet.owner = owner;
                 redbullet.hide();
                 redbullet.setBoundAction(BOUNCE);
@@ -29,6 +33,7 @@
                     ship1time.reset();
                     this.setPosition(this.owner.x, this.owner.y);
                     this.setMoveAngle(this.owner.getImgAngle());
+                    this.setImgAngle(this.owner.getImgAngle());
                     this.setSpeed(50);
                     this.show();
                     //this.startTrail();
@@ -39,6 +44,11 @@
                         redbullet.dx *= -1;
                         redbullet.calcSpeedAngle();
                         redbullet.imgAngle = redbullet.moveAngle;
+                        redBulletBounces--;
+                        document.getElementById("stat").innerHTML = redBulletBounces;
+                        if(redBulletBounces <= 0){
+                            redbullet.hide();
+                        }
                     }
                 }
                 return redbullet;
@@ -57,9 +67,7 @@
                     this.setSpeed(30);
                     this.show();
                     //this.startTrail();
-                    if (ship2time.getElapsedTime() == 2) {
-                        bluebullet.hide();
-                    }
+                    
                 } // end fire
                 bluebullet.checkCollisions = function () {
                     if (bluebullet.collidesWith(asteroid1)) {
@@ -67,12 +75,16 @@
                         bluebullet.dx *= -1;
                         bluebullet.calcSpeedAngle();
                         bluebullet.imgAngle = bluebullet.moveAngle;
+                        blueBulletBounces--;
+                        if(blueBulletBounces == 0){
+                            bluebullet.hide();
+                        }
                     }
                 }
                 return bluebullet;
             } // end bullet
             function asteroid() {
-                asteroid1 = new Sprite(game, "asteroids4.png", 50, 50);
+                asteroid1 = new Sprite(game, "asteroids4.png", 100, 100);
                 asteroid1.setPosition(400, 350);
                 asteroid1.setSpeed(0);
                 return asteroid1;
@@ -94,9 +106,6 @@
                     }
                 }
                 ship1.checkKeys = function () {
-                    if (ship1time.getElapsedTime() > 2) {
-                        redbullet.hide();
-                    }
                     if (keysDown[K_A]) {
                         this.changeImgAngleBy(-10);
                     }
@@ -112,8 +121,16 @@
                     }
                     if (keysDown[K_S]) {
                         if (ship1time.getElapsedTime() > 2) {
-                            this.bullet.fire();
+                            if(redCharge < 50){
+                                redCharge++;
+                                document.getElementById("stat2").innerHTML = redCharge;
+                            }
                         }
+                    }else if(redCharge != 0){
+                        redBulletBounces = (redCharge / 10);
+                        redCharge = 0;
+                        document.getElementById("stat2").innerHTML = redCharge;
+                        this.bullet.fire();
                     }
                     if (this.getSpeed() > 0) {
                         if (this.getSpeed() <= 1 && this.getSpeed() > 0) {
@@ -210,5 +227,7 @@
     </head>
     <body onload = "init()">
         <div>WASD to control tank, space to fire</div>
+        <div id ="stat">0</div>
+        <div id ="stat2">0</div>
     </body>
 </html>
