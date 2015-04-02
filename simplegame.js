@@ -171,6 +171,7 @@ function Sprite(scene, imageFile, width, height){
 	this.dx *= -1;
 	this.calcSpeedAngle();
 	this.imgAngle = this.moveAngle;
+        
       }
       
     } else if (this.boundAction == STOP){

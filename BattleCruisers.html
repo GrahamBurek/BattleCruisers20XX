@@ -3,14 +3,36 @@
     <head>
         <meta charset="UTF-8">
         <title>Battle Cruisers 20XX</title>
+        <style>
+            body {
+                background-color: #6699ff;
+            }
+            #instructions {
+                width: 10em; height: 5em; font-size: 22px;
+            }
+            canvas {
+                padding-left: 0;
+                padding-right: 0;
+                margin-left: auto;
+                margin-right: auto;
+                display: block;
+                width: 1600px;
+            }
+        </style>
         <script type="text/javascript"
         src = "simpleGame.js"></script>
         <script type="text/javascript">
+
+            //music files
+            var lasermp3;
+            var laserogg;
+            var bgmmp3;
+            var bgmogg;
+            
+
             var game;
             var ship1;
             var ship2;
-            //var bluebulletfade = 20;
-            //var redbulletfade = 20;
             var background;
             var redbullet;
             var bluebullet;
@@ -21,20 +43,32 @@
             var blueBulletBounces = 0;
             var redCharge = 0;
             var blueCharge = 0;
+
+            buildSounds = function () {
+                lasermp3 = new Sound("music/laser.mp3");
+                laserogg = new Sound("music/laser.ogg");
+
+                bgmmp3 = new Sound("music/bgm.mp3");
+                bgmogg = new Sound("music/bgm.ogg");
+            }
+
             function RedBullet(owner) {
                 //owner is the ship owning this bullet
                 ship1time = new Timer();
-                redbullet = new Sprite(game, "redbullet.png", 100, 50);
+                redbullet = new Sprite(game, "redbullet.png", 60, 30);
                 redbullet.owner = owner;
                 redbullet.hide();
                 redbullet.setBoundAction(BOUNCE);
                 //if(tBullet.collidesWith(asteroid))
+
                 redbullet.fire = function () {
+                    lasermp3.play();
+                    laserogg.play();
                     ship1time.reset();
                     this.setPosition(this.owner.x, this.owner.y);
                     this.setMoveAngle(this.owner.getImgAngle());
                     this.setImgAngle(this.owner.getImgAngle());
-                    this.setSpeed(50);
+                    this.setSpeed(65);
                     this.show();
                     //this.startTrail();
                 } // end fire
@@ -45,44 +79,155 @@
                         redbullet.calcSpeedAngle();
                         redbullet.imgAngle = redbullet.moveAngle;
                         redBulletBounces--;
-                        document.getElementById("stat").innerHTML = redBulletBounces;
-                        if(redBulletBounces <= 0){
+                        if (redBulletBounces <= 0) {
                             redbullet.hide();
+                        }
+
+                    }
+                    if (redbullet.collidesWith(ship2)) {
+                        ship2.hide();
+                    }
+                }
+
+                redbullet.checkBounds = function () {
+
+                    offRight = false;
+                    offLeft = false;
+                    offTop = false;
+                    offBottom = false;
+
+                    if (this.x > rightBorder) {
+                        offRight = true;
+                    }
+
+                    if (this.x < leftBorder) {
+                        offLeft = true;
+                    }
+
+                    if (this.y > bottomBorder) {
+                        offBottom = true;
+                    }
+
+                    if (this.y < 0) {
+                        offTop = true;
+                    }
+
+                    if (this.boundAction == BOUNCE) {
+                        if (offTop || offBottom) {
+                            this.dy *= -1;
+                            this.calcSpeedAngle();
+                            this.imgAngle = this.moveAngle;
+                            if (this.visible == true) {
+                                redBulletBounces--;
+                                if (redBulletBounces <= 0) {
+                                    redbullet.hide();
+                                }
+                            }
+                        }
+
+                        if (offLeft || offRight) {
+                            this.dx *= -1;
+                            this.calcSpeedAngle();
+                            this.imgAngle = this.moveAngle;
+                            if (this.visible == true) {
+                                redBulletBounces--;
+                                if (redBulletBounces <= 0) {
+                                    redbullet.hide();
+                                }
+                            }
                         }
                     }
                 }
                 return redbullet;
             } // end bullet
+
             function BlueBullet(owner) {
                 //owner is the ship owning this bullet
                 ship2time = new Timer();
-                bluebullet = new Sprite(game, "bluebullet.png", 5, 5);
+                bluebullet = new Sprite(game, "redbullet.png", 60, 30);
                 bluebullet.owner = owner;
                 bluebullet.hide();
                 bluebullet.setBoundAction(BOUNCE);
+                //if(tBullet.collidesWith(asteroid))
                 bluebullet.fire = function () {
+                    lasermp3.play();
+                    laserogg.play();
                     ship2time.reset();
                     this.setPosition(this.owner.x, this.owner.y);
                     this.setMoveAngle(this.owner.getImgAngle());
-                    this.setSpeed(30);
+                    this.setImgAngle(this.owner.getImgAngle());
+                    this.setSpeed(65);
                     this.show();
                     //this.startTrail();
-                    
                 } // end fire
+
                 bluebullet.checkCollisions = function () {
                     if (bluebullet.collidesWith(asteroid1)) {
                         bluebullet.dy *= -1;
                         bluebullet.dx *= -1;
                         bluebullet.calcSpeedAngle();
-                        bluebullet.imgAngle = bluebullet.moveAngle;
+                        bluebullet.imgAngle = redbullet.moveAngle;
                         blueBulletBounces--;
-                        if(blueBulletBounces == 0){
+                        if (blueBulletBounces <= 0) {
                             bluebullet.hide();
+                        }
+                    }
+                    if (bluebullet.collidesWith(ship1)) {
+                        ship1.hide();
+                    }
+                }
+                bluebullet.checkBounds = function () {
+
+                    offRight = false;
+                    offLeft = false;
+                    offTop = false;
+                    offBottom = false;
+
+                    if (this.x > rightBorder) {
+                        offRight = true;
+                    }
+
+                    if (this.x < leftBorder) {
+                        offLeft = true;
+                    }
+
+                    if (this.y > bottomBorder) {
+                        offBottom = true;
+                    }
+
+                    if (this.y < 0) {
+                        offTop = true;
+                    }
+
+                    if (this.boundAction == BOUNCE) {
+                        if (offTop || offBottom) {
+                            this.dy *= -1;
+                            this.calcSpeedAngle();
+                            this.imgAngle = this.moveAngle;
+                            if (this.visible == true) {
+                                blueBulletBounces--;
+                                if (blueBulletBounces <= 0) {
+                                    bluebullet.hide();
+                                }
+                            }
+                        }
+
+                        if (offLeft || offRight) {
+                            this.dx *= -1;
+                            this.calcSpeedAngle();
+                            this.imgAngle = this.moveAngle;
+                            if (this.visible == true) {
+                                blueBulletBounces--;
+                                if (blueBulletBounces <= 0) {
+                                    bluebullet.hide();
+                                }
+                            }
                         }
                     }
                 }
                 return bluebullet;
-            } // end bullet
+            }
+
             function asteroid() {
                 asteroid1 = new Sprite(game, "asteroids4.png", 100, 100);
                 asteroid1.setPosition(400, 350);
@@ -104,6 +249,8 @@
                         //prevents ship from getting stuck on asteroid bounce
                         ship1.changeSpeedBy(1);
                     }
+
+
                 }
                 ship1.checkKeys = function () {
                     if (keysDown[K_A]) {
@@ -121,15 +268,13 @@
                     }
                     if (keysDown[K_S]) {
                         if (ship1time.getElapsedTime() > 2) {
-                            if(redCharge < 50){
+                            if (redCharge < 30) {
                                 redCharge++;
-                                document.getElementById("stat2").innerHTML = redCharge;
                             }
                         }
-                    }else if(redCharge != 0){
-                        redBulletBounces = (redCharge / 10);
+                    } else if (redCharge != 0) {
+                        redBulletBounces = (redCharge / 5);
                         redCharge = 0;
-                        document.getElementById("stat2").innerHTML = redCharge;
                         this.bullet.fire();
                     }
                     if (this.getSpeed() > 0) {
@@ -177,8 +322,14 @@
                     }
                     if (keysDown[K_DOWN]) {
                         if (ship2time.getElapsedTime() > 2) {
-                            this.bullet.fire();
+                            if (blueCharge < 30) {
+                                blueCharge++;
+                            }
                         }
+                    } else if (blueCharge != 0) {
+                        blueBulletBounces = (blueCharge / 5);
+                        blueCharge = 0;
+                        this.bullet.fire();
                     }
                     if (this.getSpeed() > 0) {
                         if (this.getSpeed() <= 1 && this.getSpeed() > 0) {
@@ -196,26 +347,39 @@
              } // end if
              } // end checkHit **/
             function init() {
+                //begin the bgm
+                buildSounds();
+                
+                bgmloop =  new Timer();
+                bgmloop.reset();
+                bgmmp3.play();
+                bgmogg.play();
+                
                 game = new Scene();
-                game.setSize(800, 600);
+                game.setSize(1600, 800);
                 ship1 = new Ship1();
                 ship2 = new Ship2();
                 asteroid1 = new asteroid();
-                background = new Sprite(game, "background.png", 800, 600);
+                background = new Sprite(game, "background.png", 1600, 800);
                 background.setSpeed(0);
-                background.setPosition(400, 300);
+                background.setPosition(800, 400);
                 game.start();
             } // end init
             function update() {
+                if(bgmloop.getElapsedTime() > 215){
+                    bgmmp3.play();
+                    bgmogg.play();
+                    bgmloop.reset();
+                }
                 game.clear();
-                
+
                 ship1.checkKeys();
                 ship2.checkKeys();
                 ship1.checkCollisions();
                 ship2.checkCollisions();
                 redbullet.checkCollisions();
                 bluebullet.checkCollisions();
-                
+
                 background.update();
                 redbullet.update();
                 bluebullet.update();
@@ -226,8 +390,22 @@
         </script>
     </head>
     <body onload = "init()">
-        <div>WASD to control tank, space to fire</div>
-        <div id ="stat">0</div>
-        <div id ="stat2">0</div>
+        <p style ="text-align: center;">
+            <button id="instructions"
+                    type="button"
+                    onclick="alert('Instructions:\n\
+\n\
+Player One\n\
+W - Apply thrust\n\
+A,D - Rotate Cruiser\n\
+S - shoot (hold to charge)\n\
+\n\
+Player Two\n\
+Up arrow - Apply thrust\n\
+Left arrow, Right arrow - Rotate Cruiser\n\
+Down arrow - shoot (hold to charge)\n\
+')"
+                    >Instructions</button>
+        </p>
     </body>
 </html>
