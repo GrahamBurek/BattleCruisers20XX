@@ -28,8 +28,9 @@
             var laserogg;
             var bgmmp3;
             var bgmogg;
-            
-
+            var winSounds;
+            var hitmarker;
+            var y = 0;
             var game;
             var ship1;
             var ship2;
@@ -47,9 +48,15 @@
             buildSounds = function () {
                 lasermp3 = new Sound("music/laser.mp3");
                 laserogg = new Sound("music/laser.ogg");
-
                 bgmmp3 = new Sound("music/bgm.mp3");
-                bgmogg = new Sound("music/bgm.ogg");
+                hitmarker = new Sound("music/hitmarker.mp3");
+                winSounds = new Array(new Sound("music/airporn.mp3"), new Sound("music/barely.mp3"), 
+                new Sound("music/i_eat_pears.mp3"), new Sound("music/illuminati_confirmed.mp3"),
+                new Sound("music/im_legally_blind.mp3"), new Sound("music/im_not_a_rapper.mp3"), 
+                new Sound("music/my_name_jeff.mp3"), new Sound("music/oh_baby_a_triple.mp3"),
+                new Sound("music/really_nigga.mp3"), new Sound("music/smoke_weed_everyday.mp3"),
+                new Sound("music/u_wot_m8.mp3"), new Sound("music/whatcha_say.mp3"), new Sound("music/where_dey_at_doe.mp3"),
+                new Sound("music/wow.mp3"));
             }
 
             function RedBullet(owner) {
@@ -86,6 +93,7 @@
                     }
                     if (redbullet.collidesWith(ship2)) {
                         ship2.hide();
+                        gameEnd();
                     }
                 }
 
@@ -174,6 +182,7 @@
                     }
                     if (bluebullet.collidesWith(ship1)) {
                         ship1.hide();
+                        gameEnd();
                     }
                 }
                 bluebullet.checkBounds = function () {
@@ -290,8 +299,9 @@
             function Ship2() {
                 ship2 = new Sprite(game, "space.png", 50, 25);
                 ship2.setSpeed(0);
-                ship2.setPosition(200, 600);
+                ship2.setPosition(1400, 400);
                 ship2.setBoundAction(BOUNCE);
+                ship2.changeImgAngleBy(180);
                 ship2.bullet = new BlueBullet(ship2);
                 ship2.checkCollisions = function () {
                     if (ship2.collidesWith(asteroid1)) {
@@ -346,6 +356,21 @@
              tankRed.reset();
              } // end if
              } // end checkHit **/
+             function gameEnd(){
+                 bgmmp3.stop();
+                 hitmarker.play();
+                 var pause1 = new Timer();
+                 pause1.reset();
+                 while(true){
+                 if(pause1.getElapsedTime() > 1.5){
+                     y = Math.floor(Math.random() * 14);
+                    console.log(y);
+                    winSounds[y].play();
+                    break;
+                 }
+             }
+                 
+             }
             function init() {
                 //begin the bgm
                 buildSounds();
@@ -353,7 +378,6 @@
                 bgmloop =  new Timer();
                 bgmloop.reset();
                 bgmmp3.play();
-                bgmogg.play();
                 
                 game = new Scene();
                 game.setSize(1600, 800);
@@ -404,6 +428,8 @@ Player Two\n\
 Up arrow - Apply thrust\n\
 Left arrow, Right arrow - Rotate Cruiser\n\
 Down arrow - shoot (hold to charge)\n\
+\n\
+Charge Shots longer to allow them to bounce more!\n\
 ')"
                     >Instructions</button>
         </p>

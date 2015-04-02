@@ -601,6 +601,10 @@ function Sound(src){
   this.play = function(){
     this.snd.play();
   } // end play function
+  this.stop = function(){
+      this.snd.pause();
+      this.snd.currentTime = 0;
+  }
   
   this.showControls = function(){
     //generally not needed.
@@ -981,6 +985,7 @@ function Animation(spriteSheet, imgWidth, imgHeight, cellWidth, cellHeight){
     this.isPaused = false;
 	this.timer.reset();
   }
+  
   
   this.pause = function(){
     this.isPaused = true;
