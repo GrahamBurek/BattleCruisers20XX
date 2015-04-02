@@ -7,9 +7,14 @@
             body {
                 background-color: #6699ff;
             }
+            
             #instructions {
                 width: 10em; height: 5em; font-size: 22px;
             }
+            #retry {
+                width: 10em; height: 5em; font-size: 22px;
+            }
+            
             canvas {
                 padding-left: 0;
                 padding-right: 0;
@@ -56,7 +61,7 @@
                 new Sound("music/my_name_jeff.mp3"), new Sound("music/oh_baby_a_triple.mp3"),
                 new Sound("music/really_nigga.mp3"), new Sound("music/smoke_weed_everyday.mp3"),
                 new Sound("music/u_wot_m8.mp3"), new Sound("music/whatcha_say.mp3"), new Sound("music/where_dey_at_doe.mp3"),
-                new Sound("music/wow.mp3"));
+                new Sound("music/wow.mp3"), new Sound("music/singsing.mp3"));
             }
 
             function RedBullet(owner) {
@@ -75,7 +80,7 @@
                     this.setPosition(this.owner.x, this.owner.y);
                     this.setMoveAngle(this.owner.getImgAngle());
                     this.setImgAngle(this.owner.getImgAngle());
-                    this.setSpeed(65);
+                    this.setSpeed(40);
                     this.show();
                     //this.startTrail();
                 } // end fire
@@ -164,7 +169,7 @@
                     this.setPosition(this.owner.x, this.owner.y);
                     this.setMoveAngle(this.owner.getImgAngle());
                     this.setImgAngle(this.owner.getImgAngle());
-                    this.setSpeed(65);
+                    this.setSpeed(40);
                     this.show();
                     //this.startTrail();
                 } // end fire
@@ -263,15 +268,15 @@
                 }
                 ship1.checkKeys = function () {
                     if (keysDown[K_A]) {
-                        this.changeImgAngleBy(-10);
+                        this.changeImgAngleBy(-5);
                     }
                     if (keysDown[K_D]) {
-                        this.changeImgAngleBy(10);
+                        this.changeImgAngleBy(5);
                         //this.changeAngleBy(10);
                     }
                     if (keysDown[K_W]) {
-                        if (this.getSpeed() < 65) {
-                            this.addVector(this.getImgAngle(), 3);
+                        if (this.getSpeed() < 30) {
+                            this.addVector(this.getImgAngle(), 2);
                         }
                         // end if
                     }
@@ -318,15 +323,15 @@
                         bluebullet.hide();
                     }
                     if (keysDown[K_LEFT]) {
-                        this.changeImgAngleBy(-10);
+                        this.changeImgAngleBy(-5);
                     }
                     if (keysDown[K_RIGHT]) {
-                        this.changeImgAngleBy(10);
+                        this.changeImgAngleBy(5);
                         //this.changeAngleBy(10);
                     }
                     if (keysDown[K_UP]) {
-                        if (this.getSpeed() < 65) {
-                            this.addVector(this.getImgAngle(), 3);
+                        if (this.getSpeed() < 30) {
+                            this.addVector(this.getImgAngle(), 2);
                         }
                         // end if
                     }
@@ -363,11 +368,13 @@
                  pause1.reset();
                  while(true){
                  if(pause1.getElapsedTime() > 1.5){
-                     y = Math.floor(Math.random() * 14);
+                     y = Math.floor(Math.random() * (winSounds.length));
+                   
                     console.log(y);
                     winSounds[y].play();
                     break;
                  }
+                 document.getElementById("retry").disabled = false;
              }
                  
              }
@@ -375,20 +382,29 @@
                 //begin the bgm
                 buildSounds();
                 
-                bgmloop =  new Timer();
-                bgmloop.reset();
-                bgmmp3.play();
+                try{
+                    bgmmp3.stop();
+                }catch(err){
+                    
+                }
                 
                 game = new Scene();
                 game.setSize(1600, 800);
-                ship1 = new Ship1();
-                ship2 = new Ship2();
-                asteroid1 = new asteroid();
+                gameStart();
                 background = new Sprite(game, "background.png", 1600, 800);
                 background.setSpeed(0);
                 background.setPosition(800, 400);
                 game.start();
             } // end init
+            function gameStart(){
+                ship1 = new Ship1();
+                ship2 = new Ship2();
+                asteroid1 = new asteroid();
+                bgmloop =  new Timer();
+                bgmloop.reset();
+                bgmmp3.play();
+                document.getElementById("retry").disabled = true;
+            }
             function update() {
                 if(bgmloop.getElapsedTime() > 215){
                     bgmmp3.play();
@@ -414,7 +430,7 @@
         </script>
     </head>
     <body onload = "init()">
-        <p style ="text-align: center;">
+        <p style="text-align: center;">
             <button id="instructions"
                     type="button"
                     onclick="alert('Instructions:\n\
@@ -432,6 +448,12 @@ Down arrow - shoot (hold to charge)\n\
 Charge Shots longer to allow them to bounce more!\n\
 ')"
                     >Instructions</button>
+            <button id ="retry"
+                    type ="button"
+                    onclick ="gameStart()"
+                    disabled>
+                     New Game
+            </button>
         </p>
     </body>
 </html>

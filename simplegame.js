@@ -475,7 +475,7 @@ function Scene(){
 	document.onkeydown = this.updateKeys;
 	document.onkeyup = this.clearKeys;
       } // end if
-      this.intID = setInterval(localUpdate, 50);
+      this.intID = setInterval(localUpdate, 20);
       document.onmousemove = this.updateMousePos;
       document.mouseClicked = false;
       document.onmousedown = function(){
