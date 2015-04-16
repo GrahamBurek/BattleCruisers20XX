@@ -7,14 +7,24 @@
             body {
                 background-color: #6699ff;
             }
-            
+
             #instructions {
                 width: 10em; height: 5em; font-size: 22px;
             }
             #retry {
                 width: 10em; height: 5em; font-size: 22px;
             }
-            
+
+            #bar1 {
+                text-align: left;
+            }
+            #bar2 {
+                text-align: right;
+            }
+            #buttons {
+                text-align:center;
+            }
+
             canvas {
                 padding-left: 0;
                 padding-right: 0;
@@ -28,14 +38,15 @@
         src = "simpleGame.js"></script>
         <script type="text/javascript">
 
-            //music files
+            //music variables
+            var trackNum;
             var lasermp3;
             var laserogg;
-            var bgmmp3;
-            var bgmogg;
+            var bgms;
             var winSounds;
             var hitmarker;
             var y = 0;
+
             var game;
             var ship1;
             var ship2;
@@ -44,30 +55,33 @@
             var bluebullet;
             var ship1time;
             var ship2time;
-            var asteroid1;
-            var redBulletBounces = 0.0;
+//            var asteroid1;
+            var asteroids;
+            var redBulletBounces = 0;
             var blueBulletBounces = 0;
-            var redCharge = 0;
-            var blueCharge = 0;
+            var redCharge = 0.0;
+            var blueCharge = 0.0;
+            var progressBar1 = document.getElementById("progressbar1");
+            var progressBar2 = document.getElementById("progressbar2");
 
             buildSounds = function () {
+                bgms = new Array(new Sound("music/bgm1.mp3"),new Sound("music/bgm2.mp3"),new Sound("music/bgm3.mp3"));
                 lasermp3 = new Sound("music/laser.mp3");
                 laserogg = new Sound("music/laser.ogg");
-                bgmmp3 = new Sound("music/bgm.mp3");
                 hitmarker = new Sound("music/hitmarker.mp3");
-                winSounds = new Array(new Sound("music/airporn.mp3"), new Sound("music/barely.mp3"), 
-                new Sound("music/i_eat_pears.mp3"), new Sound("music/illuminati_confirmed.mp3"),
-                new Sound("music/im_legally_blind.mp3"), new Sound("music/im_not_a_rapper.mp3"), 
-                new Sound("music/my_name_jeff.mp3"), new Sound("music/oh_baby_a_triple.mp3"),
-                new Sound("music/really_nigga.mp3"), new Sound("music/smoke_weed_everyday.mp3"),
-                new Sound("music/u_wot_m8.mp3"), new Sound("music/whatcha_say.mp3"), new Sound("music/where_dey_at_doe.mp3"),
-                new Sound("music/wow.mp3"), new Sound("music/singsing.mp3"));
+                winSounds = new Array(new Sound("music/airporn.mp3"), new Sound("music/barely.mp3"),
+                        new Sound("music/i_eat_pears.mp3"), new Sound("music/illuminati_confirmed.mp3"),
+                        new Sound("music/im_legally_blind.mp3"), new Sound("music/im_not_a_rapper.mp3"),
+                        new Sound("music/my_name_jeff.mp3"), new Sound("music/oh_baby_a_triple.mp3"),
+                        new Sound("music/really_nigga.mp3"), new Sound("music/smoke_weed_everyday.mp3"),
+                        new Sound("music/u_wot_m8.mp3"), new Sound("music/whatcha_say.mp3"), new Sound("music/where_dey_at_doe.mp3"),
+                        new Sound("music/wow.mp3"), new Sound("music/singsing.mp3"));
             }
 
             function RedBullet(owner) {
                 //owner is the ship owning this bullet
                 ship1time = new Timer();
-                redbullet = new Sprite(game, "redbullet.png", 60, 30);
+                redbullet = new Sprite(game, "images/redbullet.png", 60, 30);
                 redbullet.owner = owner;
                 redbullet.hide();
                 redbullet.setBoundAction(BOUNCE);
@@ -85,16 +99,18 @@
                     //this.startTrail();
                 } // end fire
                 redbullet.checkCollisions = function () {
-                    if (redbullet.collidesWith(asteroid1)) {
-                        redbullet.dy *= -1;
-                        redbullet.dx *= -1;
-                        redbullet.calcSpeedAngle();
-                        redbullet.imgAngle = redbullet.moveAngle;
-                        redBulletBounces--;
-                        if (redBulletBounces <= 0) {
-                            redbullet.hide();
-                        }
+                    for (var i = 0; i < asteroids.length; i++) {
+                        if (redbullet.collidesWith(asteroids[i])) {
+                            redbullet.dy *= -1;
+                            redbullet.dx *= -1;
+                            redbullet.calcSpeedAngle();
 
+                            redBulletBounces--;
+                            if (redBulletBounces <= 0) {
+                                redbullet.hide();
+                            }
+
+                        }
                     }
                     if (redbullet.collidesWith(ship2)) {
                         ship2.hide();
@@ -129,7 +145,7 @@
                         if (offTop || offBottom) {
                             this.dy *= -1;
                             this.calcSpeedAngle();
-                            this.imgAngle = this.moveAngle;
+                           
                             if (this.visible == true) {
                                 redBulletBounces--;
                                 if (redBulletBounces <= 0) {
@@ -154,14 +170,15 @@
                 return redbullet;
             } // end bullet
 
-            function BlueBullet(owner) {
+             function BlueBullet(owner) {
                 //owner is the ship owning this bullet
                 ship2time = new Timer();
-                bluebullet = new Sprite(game, "redbullet.png", 60, 30);
+                bluebullet = new Sprite(game, "images/bluebullet.png", 60, 30);
                 bluebullet.owner = owner;
                 bluebullet.hide();
                 bluebullet.setBoundAction(BOUNCE);
                 //if(tBullet.collidesWith(asteroid))
+
                 bluebullet.fire = function () {
                     lasermp3.play();
                     laserogg.play();
@@ -173,16 +190,18 @@
                     this.show();
                     //this.startTrail();
                 } // end fire
-
                 bluebullet.checkCollisions = function () {
-                    if (bluebullet.collidesWith(asteroid1)) {
-                        bluebullet.dy *= -1;
-                        bluebullet.dx *= -1;
-                        bluebullet.calcSpeedAngle();
-                        bluebullet.imgAngle = redbullet.moveAngle;
-                        blueBulletBounces--;
-                        if (blueBulletBounces <= 0) {
-                            bluebullet.hide();
+                    for (var i = 0; i < asteroids.length; i++) {
+                        if (bluebullet.collidesWith(asteroids[i])) {
+                            bluebullet.dy *= -1;
+                            bluebullet.dx *= -1;
+                            bluebullet.calcSpeedAngle();
+
+                            blueBulletBounces--;
+                            if (blueBulletBounces <= 0) {
+                                bluebullet.hide();
+                            }
+
                         }
                     }
                     if (bluebullet.collidesWith(ship1)) {
@@ -190,6 +209,7 @@
                         gameEnd();
                     }
                 }
+
                 bluebullet.checkBounds = function () {
 
                     offRight = false;
@@ -217,7 +237,7 @@
                         if (offTop || offBottom) {
                             this.dy *= -1;
                             this.calcSpeedAngle();
-                            this.imgAngle = this.moveAngle;
+                           
                             if (this.visible == true) {
                                 blueBulletBounces--;
                                 if (blueBulletBounces <= 0) {
@@ -240,30 +260,58 @@
                     }
                 }
                 return bluebullet;
+            } // end bullet
+            
+            function makeAsteroids() {
+                asteroids = new Array(new Sprite(game, "images/asteroid1.png", 100, 100),
+                        new Sprite(game, "images/asteroid2.png", 100, 100),
+                        new Sprite(game, "images/asteroid3.png", 100, 100),
+                        new Sprite(game, "images/asteroid4.png", 100, 100),
+                        new Sprite(game, "images/asteroid1.png", 100, 100),
+                        new Sprite(game, "images/asteroid2.png", 100, 100),
+                        new Sprite(game, "images/asteroid3.png", 100, 100))
+
+                for (var i = 0; i < asteroids.length; i++) {
+                    asteroids[0].setPosition(400, 450);
+                    asteroids[0].setSpeed(0);
+                    asteroids[1].setPosition(700, 700);
+                    asteroids[1].setSpeed(0);
+                    asteroids[2].setPosition(200, 150);
+                    asteroids[2].setSpeed(0);
+                    asteroids[3].setPosition(1200, 100);
+                    asteroids[3].setSpeed(0);
+                    asteroids[4].setPosition(1500, 700);
+                    asteroids[4].setSpeed(0);
+                    asteroids[5].setPosition(800, 200);
+                    asteroids[5].setSpeed(0);
+                    asteroids[6].setPosition(1200, 350);
+                    asteroids[6].setSpeed(0);
+                }
             }
 
-            function asteroid() {
-                asteroid1 = new Sprite(game, "asteroids4.png", 100, 100);
-                asteroid1.setPosition(400, 350);
-                asteroid1.setSpeed(0);
-                return asteroid1;
-            }
+//            function asteroid() {
+//                asteroid1 = new Sprite(game, "asteroids4.png", 100, 100);
+//                asteroid1.setPosition(400, 350);
+//                asteroid1.setSpeed(0);
+//                return asteroid1;
+//            }
             function Ship1() {
-                ship1 = new Sprite(game, "space.png", 50, 25);
+                ship1 = new Sprite(game, "images/space.png", 75, 38);
                 ship1.setSpeed(0);
                 ship1.setPosition(100, 550);
                 ship1.setBoundAction(BOUNCE);
                 ship1.bullet = new RedBullet(ship1);
                 ship1.checkCollisions = function () {
-                    if (ship1.collidesWith(asteroid1)) {
-                        ship1.dy *= -1;
-                        ship1.dx *= -1;
-                        ship1.calcSpeedAngle();
-                        ship1.imgAngle = ship1.moveAngle;
-                        //prevents ship from getting stuck on asteroid bounce
-                        ship1.changeSpeedBy(1);
+                    for (var i = 0; i < asteroids.length; i++) {
+                        if (ship1.collidesWith(asteroids[i])) {
+                            ship1.dy *= -1;
+                            ship1.dx *= -1;
+                            ship1.calcSpeedAngle();
+                            ship1.imgAngle = ship1.moveAngle;
+                            //prevents ship from getting stuck on asteroid bounce
+                            ship1.changeSpeedBy(1);
+                        }
                     }
-
 
                 }
                 ship1.checkKeys = function () {
@@ -275,21 +323,28 @@
                         //this.changeAngleBy(10);
                     }
                     if (keysDown[K_W]) {
-                        if (this.getSpeed() < 30) {
+                        ship1.changeImage("images/spacethrust.png");
+                        if (this.getSpeed() < 20) {
                             this.addVector(this.getImgAngle(), 2);
                         }
                         // end if
                     }
+                    else {
+                        ship1.changeImage("images/space.png");
+                    }
                     if (keysDown[K_S]) {
-                        if (ship1time.getElapsedTime() > 2) {
+                        if (ship1time.getElapsedTime() > 2 && ship1.visible == true) {
                             if (redCharge < 30) {
                                 redCharge++;
+                                document.getElementById("progressbar1").value = redCharge;
+
                             }
                         }
                     } else if (redCharge != 0) {
                         redBulletBounces = (redCharge / 5);
                         redCharge = 0;
                         this.bullet.fire();
+                        document.getElementById("progressbar1").value = 0;
                     }
                     if (this.getSpeed() > 0) {
                         if (this.getSpeed() <= 1 && this.getSpeed() > 0) {
@@ -301,27 +356,26 @@
                 } // end checkKeys
                 return ship1;
             } // end tank
+
             function Ship2() {
-                ship2 = new Sprite(game, "space.png", 50, 25);
+                ship2 = new Sprite(game, "images/space.png", 75, 38);
                 ship2.setSpeed(0);
                 ship2.setPosition(1400, 400);
                 ship2.setBoundAction(BOUNCE);
-                ship2.changeImgAngleBy(180);
                 ship2.bullet = new BlueBullet(ship2);
                 ship2.checkCollisions = function () {
-                    if (ship2.collidesWith(asteroid1)) {
-                        ship2.dy *= -1;
-                        ship2.dx *= -1;
-                        ship2.calcSpeedAngle();
-                        ship2.imgAngle = ship2.moveAngle;
-                        //prevents ship from getting stuck on asteroid bounce
-                        ship2.changeSpeedBy(1);
+                    for (var i = 0; i < asteroids.length; i++) {
+                        if (ship2.collidesWith(asteroids[i])) {
+                            ship2.dy *= -1;
+                            ship2.dx *= -1;
+                            ship2.calcSpeedAngle();
+                            ship2.imgAngle = ship2.moveAngle;
+                            //prevents ship from getting stuck on asteroid bounce
+                            ship2.changeSpeedBy(1);
+                        }
                     }
                 }
                 ship2.checkKeys = function () {
-                    if (ship2time.getElapsedTime() > 2) {
-                        bluebullet.hide();
-                    }
                     if (keysDown[K_LEFT]) {
                         this.changeImgAngleBy(-5);
                     }
@@ -330,21 +384,26 @@
                         //this.changeAngleBy(10);
                     }
                     if (keysDown[K_UP]) {
-                        if (this.getSpeed() < 30) {
+                        ship2.changeImage("images/spacethrust.png");
+                        if (this.getSpeed() < 20) {
                             this.addVector(this.getImgAngle(), 2);
                         }
                         // end if
+                    } else {
+                        ship2.changeImage("images/space.png");
                     }
                     if (keysDown[K_DOWN]) {
-                        if (ship2time.getElapsedTime() > 2) {
-                            if (blueCharge < 30) {
+                        if (ship2time.getElapsedTime() > 2 && ship2.visible == true) {
+                            if (blueCharge < 30.0) {
                                 blueCharge++;
+                                document.getElementById("progressbar2").value = blueCharge;
                             }
                         }
                     } else if (blueCharge != 0) {
                         blueBulletBounces = (blueCharge / 5);
                         blueCharge = 0;
                         this.bullet.fire();
+                        document.getElementById("progressbar2").value = 0;
                     }
                     if (this.getSpeed() > 0) {
                         if (this.getSpeed() <= 1 && this.getSpeed() > 0) {
@@ -361,69 +420,90 @@
              tankRed.reset();
              } // end if
              } // end checkHit **/
-             function gameEnd(){
-                 bgmmp3.stop();
-                 hitmarker.play();
-                 var pause1 = new Timer();
-                 pause1.reset();
-                 while(true){
-                 if(pause1.getElapsedTime() > 1.5){
-                     y = Math.floor(Math.random() * (winSounds.length));
-                   
-                    console.log(y);
-                    winSounds[y].play();
-                    break;
-                 }
-                 document.getElementById("retry").disabled = false;
-             }
-                 
-             }
+            function gameEnd() {
+                bgms[trackNum].stop();
+                hitmarker.play();
+                var pause1 = new Timer();
+                pause1.reset();
+                while (true) {
+                    if (pause1.getElapsedTime() > 1.5) {
+                        y = Math.floor(Math.random() * (winSounds.length));
+
+                        console.log(y);
+                        winSounds[y].play();
+                        break;
+                    }
+                    document.getElementById("retry").disabled = false;
+                }
+
+            }
             function init() {
                 //begin the bgm
                 buildSounds();
-                
-                try{
-                    bgmmp3.stop();
-                }catch(err){
-                    
+
+                try {
+                    bgms[trackNum].stop();
+                } catch (err) {
+
                 }
-                
+
                 game = new Scene();
                 game.setSize(1600, 800);
                 gameStart();
-                background = new Sprite(game, "background.png", 1600, 800);
+                background = new Sprite(game, "images/background.png", 1600, 800);
                 background.setSpeed(0);
                 background.setPosition(800, 400);
                 game.start();
             } // end init
-            function gameStart(){
+            function gameStart() {
                 ship1 = new Ship1();
                 ship2 = new Ship2();
-                asteroid1 = new asteroid();
-                bgmloop =  new Timer();
+                makeAsteroids();
+                bgmloop = new Timer();
                 bgmloop.reset();
-                bgmmp3.play();
+                trackNum = (Math.floor((Math.random()*3)));
+                bgms[trackNum].play();
                 document.getElementById("retry").disabled = true;
             }
+
+            function updateAsteroids() {
+                for (var i = 0; i < asteroids.length; i++) {
+                    asteroids[i].update();
+                }
+            }
+
             function update() {
-                if(bgmloop.getElapsedTime() > 215){
-                    bgmmp3.play();
-                    bgmogg.play();
+                if(trackNum == 0){
+                if (bgmloop.getElapsedTime() > 215) {
+                    bgms[trackNum].play();
                     bgmloop.reset();
                 }
+            }
+                if(trackNum == 1){
+                    if (bgmloop.getElapsedTime() > 237) {
+                    bgms[trackNum].play();
+                    bgmloop.reset();
+                }
+                }
+                if(trackNum == 2){
+                    if (bgmloop.getElapsedTime() > 189) {
+                    bgms[trackNum].play();
+                    bgmloop.reset();
+                }
+                }
                 game.clear();
-
                 ship1.checkKeys();
                 ship2.checkKeys();
                 ship1.checkCollisions();
                 ship2.checkCollisions();
                 redbullet.checkCollisions();
                 bluebullet.checkCollisions();
-
+                redbullet.imgAngle = redbullet.moveAngle;
+                bluebullet.imgAngle = bluebullet.moveAngle;
                 background.update();
                 redbullet.update();
                 bluebullet.update();
-                asteroid1.update();
+                updateAsteroids();
                 ship1.update();
                 ship2.update();
             } // end update
@@ -431,6 +511,8 @@
     </head>
     <body onload = "init()">
         <p style="text-align: center;">
+        
+        <div id="buttons">
             <button id="instructions"
                     type="button"
                     onclick="alert('Instructions:\n\
@@ -452,8 +534,15 @@ Charge Shots longer to allow them to bounce more!\n\
                     type ="button"
                     onclick ="gameStart()"
                     disabled>
-                     New Game
+                New Game
             </button>
-        </p>
-    </body>
+        </div>
+        <div id="bar1">
+            <progress id="progressbar1" value="0" max="30"></progress>
+        </div>
+        <div id="bar2">
+            <progress id="progressbar2" value="0" max="30"></progress>
+        </div>
+    </p>
+</body>
 </html>
