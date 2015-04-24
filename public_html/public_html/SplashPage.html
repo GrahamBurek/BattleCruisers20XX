@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>BattleCruisers20XX</title>
+        <meta charset="UTF-8">
+        <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
+        <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+        <script type="text/javascript"
+        src = "simpleGame.js"></script>
+        <style type="text/CSS">
+            html { 
+                background: url(images/splash.jpg) no-repeat center center fixed; 
+                -webkit-background-size: cover;
+                -moz-background-size: cover;
+                -o-background-size: cover;
+                background-size: cover;
+            }
+
+            #playbutton {
+                text-align: center; 
+            }
+            
+            #title {
+                z-index: 999;
+            }
+
+            button {
+                position: absolute;
+                top: 0%;
+                cursor:pointer; 
+                padding:25px 100px; 
+                background:#35b128; 
+                border:1px solid #33842a;
+                -moz-border-radius: 10px;
+                -webkit-border-radius: 10px;
+                border-radius: 10px;
+                -webkit-box-shadow: 0 0 4px rgba(0,0,0, .75);
+                -moz-box-shadow: 0 0 4px rgba(0,0,0, .75);
+                box-shadow: 0 0 4px rgba(0,0,0, .75);
+                color:#f3f3f3;
+                font-size:1.1em;
+            }
+        </style>
+        <script type="text/javascript">
+            function redirect() {
+                window.location = "BattleCruisers.html";
+                return;
+            }
+            
+            function splashMusic(){
+                var splashMusic;
+                
+                function init(){
+                    splashMusic = new Sound(music/sandstorm.mp3);
+                    splashMusic.play();
+                }
+            }
+        </script>
+    </head>
+    <body onload="init()">
+        <div id="playbutton">
+            <button type="button" onclick="redirect()">
+                Play!
+            </button>
+        </div>
+        <img src="images/logo.png">
+    </body>
+</html>

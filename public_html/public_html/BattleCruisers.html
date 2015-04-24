@@ -3,8 +3,8 @@
     <head>
         <meta charset="UTF-8">
         <title>Battle Cruisers 20XX</title>
-        <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-        <link rel="icon" href="favicon.ico" type="image/x-icon">
+        <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
+        <link rel="icon" href="images/favicon.ico" type="image/x-icon">
         <!--Set up CSS for game. -->
         <style>
             body {
@@ -132,7 +132,7 @@
                 };
                 
                 // Overriding checkBounds function from simpleGame.js
-                redbullet.checkBounds = function () {
+                redbullet.checkBounds = function() {
 
                     offRight = false;
                     offLeft = false;
@@ -306,7 +306,7 @@
                     asteroids[4].setSpeed(0);
                     asteroids[5].setPosition(800, 200);
                     asteroids[5].setSpeed(0);
-                    asteroids[6].setPosition(1200, 350);
+                    asteroids[6].setPosition(1200, 450);
                     asteroids[6].setSpeed(0);
                 }
             }
@@ -372,6 +372,49 @@
                         }
                     }
                 } // end checkKeys
+                
+                
+                // Override checkBounds function.
+                ship1.checkBounds = function() {
+
+                    offRight = false;
+                    offLeft = false;
+                    offTop = false;
+                    offBottom = false;
+
+                    if (this.x > rightBorder) {
+                        offRight = true;
+                    }
+
+                    if (this.x < leftBorder) {
+                        offLeft = true;
+                    }
+
+                    if (this.y > bottomBorder) {
+                        offBottom = true;
+                    }
+
+                    if (this.y < 0) {
+                        offTop = true;
+                    }
+
+                    if (this.boundAction === BOUNCE) {
+                        if (offTop || offBottom) {
+                            this.dy *= -1;
+                            this.calcSpeedAngle();
+                            this.imgAngle = this.moveAngle;
+                            ship1.changeSpeedBy(5);
+                        }
+
+                        if (offLeft || offRight) {
+                            this.dx *= -1;
+                            this.calcSpeedAngle();
+                            this.imgAngle = this.moveAngle;
+                            ship1.changeSpeedBy(5);
+                        }
+                    }
+                };
+                
                 return ship1;
             } // end ship1
 
@@ -431,6 +474,48 @@
                         }
                     }
                 } // end checkKeys
+                
+                // Override checkBounds function.
+                ship2.checkBounds = function() {
+
+                    offRight = false;
+                    offLeft = false;
+                    offTop = false;
+                    offBottom = false;
+
+                    if (this.x > rightBorder) {
+                        offRight = true;
+                    }
+
+                    if (this.x < leftBorder) {
+                        offLeft = true;
+                    }
+
+                    if (this.y > bottomBorder) {
+                        offBottom = true;
+                    }
+
+                    if (this.y < 0) {
+                        offTop = true;
+                    }
+
+                    if (this.boundAction === BOUNCE) {
+                        if (offTop || offBottom) {
+                            this.dy *= -1;
+                            this.calcSpeedAngle();
+                            this.imgAngle = this.moveAngle;
+                            ship2.changeSpeedBy(5);
+                        }
+
+                        if (offLeft || offRight) {
+                            this.dx *= -1;
+                            this.calcSpeedAngle();
+                            this.imgAngle = this.moveAngle;
+                            ship2.changeSpeedBy(5);
+                        }
+                    }
+                };
+                
                 return ship2;
             } // end ship2
            
@@ -541,12 +626,12 @@
 Player One\n\
 W - Apply thrust\n\
 A,D - Rotate Cruiser\n\
-S - shoot (hold to charge)\n\
+S - Shoot (hold to charge)\n\
 \n\
 Player Two\n\
 Up arrow - Apply thrust\n\
 Left arrow, Right arrow - Rotate Cruiser\n\
-Down arrow - shoot (hold to charge)\n\
+Down arrow - Shoot (hold to charge)\n\
 \n\
 Charge Shots longer to allow them to bounce more!\n\
 ')"
@@ -559,7 +644,7 @@ Charge Shots longer to allow them to bounce more!\n\
             </button>
         </div>
         <div id="bar1">
-            <progress id="progressbar1" value="0" max="30"></progress>
+            <progress id="progressbar1" value="0" max="30" ></progress>
         </div>
         <div id="bar2">
             <progress id="progressbar2" value="0" max="30"></progress>
