@@ -58,7 +58,7 @@
             var bluebullet;
             var asteroids;
             
-            // Timer variables
+            // Timer declarations
             var ship1time;
             var ship2time;
            
@@ -72,6 +72,14 @@
             
             // scene
             var game;
+            
+            //constants
+            var SHIP_LEFT_TURN_SPEED = -5;
+            var SHIP_RIGHT_TURN_SPEED = 5;
+            var MAX_BULLET_CHARGE = 30.0;
+            var SONG_1_LENGTH = 215;
+            var SONG_2_LENGTH = 237;
+            var SONG_3_LENGTH = 189;
 
             // Create all the sounds at the beginning of the game, used in init() function.
             buildSounds = function () {
@@ -334,11 +342,11 @@
                 
                 ship1.checkKeys = function () {
                     if (keysDown[K_A]) {
-                        this.changeImgAngleBy(-5);
+                        this.changeImgAngleBy(SHIP_LEFT_TURN_SPEED);
                     }
                     
                     if (keysDown[K_D]) {
-                        this.changeImgAngleBy(5);
+                        this.changeImgAngleBy(SHIP_RIGHT_TURN_SPEED);
                     }
                     
                     if (keysDown[K_W]) {
@@ -352,7 +360,7 @@
                     }
                     if (keysDown[K_S]) {
                         if (ship1time.getElapsedTime() > 2 && ship1.visible === true) {
-                            if (redCharge < 30) {
+                            if (redCharge < MAX_BULLET_CHARGE) {
                                 redCharge++;
                                 document.getElementById("progressbar1").value = redCharge;
 
@@ -364,6 +372,7 @@
                         this.bullet.fire();
                         document.getElementById("progressbar1").value = 0;
                     }
+                    // Slows down the ship when no key is pressed.
                     if (this.getSpeed() > 0) {
                         if (this.getSpeed() <= 1 && this.getSpeed() > 0) {
                             this.changeSpeedBy(-(this.getSpeed()));
@@ -439,10 +448,10 @@
                 }
                 ship2.checkKeys = function () {
                     if (keysDown[K_LEFT]) {
-                        this.changeImgAngleBy(-5);
+                        this.changeImgAngleBy(SHIP_LEFT_TURN_SPEED);
                     }
                     if (keysDown[K_RIGHT]) {
-                        this.changeImgAngleBy(5);
+                        this.changeImgAngleBy(SHIP_RIGHT_TURN_SPEED);
                     }
                     if (keysDown[K_UP]) {
                         ship2.changeImage("images/spacethrust.png");
@@ -455,7 +464,7 @@
                     }
                     if (keysDown[K_DOWN]) {
                         if (ship2time.getElapsedTime() > 2 && ship2.visible === true) {
-                            if (blueCharge < 30.0) {
+                            if (blueCharge < MAX_BULLET_CHARGE) {
                                 blueCharge++;
                                 document.getElementById("progressbar2").value = blueCharge;
                             }
@@ -466,6 +475,7 @@
                         this.bullet.fire();
                         document.getElementById("progressbar2").value = 0;
                     }
+                    // Slows down the ship when no key is pressed.
                     if (this.getSpeed() > 0) {
                         if (this.getSpeed() <= 1 && this.getSpeed() > 0) {
                             this.changeSpeedBy(-(this.getSpeed()));
@@ -580,19 +590,19 @@
             function update() {
                 // Loop the bgms based on the song length.
                 if(trackNum === 0){
-                if (bgmloop.getElapsedTime() > 215) {
+                if (bgmloop.getElapsedTime() > SONG_1_LENGTH) {
                     bgms[trackNum].play();
                     bgmloop.reset();
                 }
             }
                 if(trackNum === 1){
-                    if (bgmloop.getElapsedTime() > 237) {
+                    if (bgmloop.getElapsedTime() > SONG_2_LENGTH) {
                     bgms[trackNum].play();
                     bgmloop.reset();
                 }
                 }
                 if(trackNum === 2){
-                    if (bgmloop.getElapsedTime() > 189) {
+                    if (bgmloop.getElapsedTime() > SONG_3_LENGTH) {
                     bgms[trackNum].play();
                     bgmloop.reset();
                 }
@@ -652,3 +662,4 @@ Charge Shots longer to allow them to bounce more!\n\
     </p>
 </body>
 </html>
+
